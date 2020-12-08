@@ -27,8 +27,8 @@
 #endif
 #include "LinkedList.h"
 #include "Clients.h"
+#include <stdbool.h>
 
-typedef unsigned int bool;
 typedef void* (*pf)(int, unsigned char, char*, size_t);
 
 #include "MQTTProperties.h"

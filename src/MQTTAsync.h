@@ -1070,6 +1070,13 @@ typedef struct
 	*/
 	const char* enabledCipherSuites;
 
+  /**
+   * The list of groups that the clien will present to the server during the SSL handshake, specifically
+   * for the key exchange. Available only to the TLS 1.3 version.
+   * 
+  */
+  const char* enabledGroups;
+
     /** True/False option to enable verification of the server certificate **/
     int enableServerCertAuth;
 
@@ -1141,7 +1148,7 @@ typedef struct
 	unsigned int protos_len;
 } MQTTAsync_SSLOptions;
 
-#define MQTTAsync_SSLOptions_initializer { {'M', 'Q', 'T', 'S'}, 5, NULL, NULL, NULL, NULL, NULL, 1, MQTT_SSL_VERSION_DEFAULT, 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0 }
+#define MQTTAsync_SSLOptions_initializer { {'M', 'Q', 'T', 'S'}, 5, NULL, NULL, NULL, NULL, NULL, NULL, 1, MQTT_SSL_VERSION_DEFAULT, 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0 }
 
 /** Utility structure where name/value pairs are needed */
 typedef struct

@@ -643,6 +643,7 @@ typedef struct
 #define MQTT_SSL_VERSION_TLS_1_0 1
 #define MQTT_SSL_VERSION_TLS_1_1 2
 #define MQTT_SSL_VERSION_TLS_1_2 3
+#define MQQT_SSL_VERSION_TLS_1_3 4
 
 /**
 * MQTTClient_sslProperties defines the settings to establish an SSL/TLS connection using the
@@ -695,6 +696,13 @@ typedef struct
 	* This setting can be used to set an SSL anonymous connection ("aNULL" string value, for instance).
 	*/
 	const char* enabledCipherSuites;
+
+  /**
+   * The list of groups that the clien will present to the server during the SSL handshake, specifically
+   * for the key exchange. Available only to the TLS 1.3 version.
+   * 
+  */
+  const char* enabledGroups;
 
     /** True/False option to enable verification of the server certificate **/
     int enableServerCertAuth;
@@ -767,7 +775,7 @@ typedef struct
 	unsigned int protos_len;
 } MQTTClient_SSLOptions;
 
-#define MQTTClient_SSLOptions_initializer { {'M', 'Q', 'T', 'S'}, 5, NULL, NULL, NULL, NULL, NULL, 1, MQTT_SSL_VERSION_DEFAULT, 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0 }
+#define MQTTClient_SSLOptions_initializer { {'M', 'Q', 'T', 'S'}, 5, NULL, NULL, NULL, NULL, NULL, NULL, 1, MQTT_SSL_VERSION_DEFAULT, 0, NULL, NULL, NULL, NULL, NULL, 0, NULL, 0 }
 
 /**
   * MQTTClient_libraryInfo is used to store details relating to the currently used

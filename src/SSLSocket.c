@@ -550,39 +550,7 @@ int SSLSocket_createContext(networkHandles* net, MQTTClient_SSLOptions* opts)
 	FUNC_ENTRY;
 	if (net->ctx == NULL)
 	{
-#if (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 		net->ctx = SSL_CTX_new(TLS_client_method());
-#else
-		int sslVersion = MQTT_SSL_VERSION_DEFAULT;
-		if (opts->struct_version >= 1) sslVersion = opts->sslVersion;
-/* SSL_OP_NO_TLSv1_1 is defined in ssl.h if the library version supports TLSv1.1.
- * OPENSSL_NO_TLS1 is defined in opensslconf.h or on the compiler command line
- * if TLS1.x was removed at OpenSSL library build time via Configure options.
- */
-		switch (sslVersion)
-		{
-		case MQTT_SSL_VERSION_DEFAULT:
-			net->ctx = SSL_CTX_new(SSLv23_client_method()); /* SSLv23 for compatibility with SSLv2, SSLv3 and TLSv1 */
-			break;
-#if defined(SSL_OP_NO_TLSv1) && !defined(OPENSSL_NO_TLS1)
-		case MQTT_SSL_VERSION_TLS_1_0:
-			net->ctx = SSL_CTX_new(TLSv1_client_method());
-			break;
-#endif
-#if defined(SSL_OP_NO_TLSv1_1) && !defined(OPENSSL_NO_TLS1)
-		case MQTT_SSL_VERSION_TLS_1_1:
-			net->ctx = SSL_CTX_new(TLSv1_1_client_method());
-			break;
-#endif
-#if defined(SSL_OP_NO_TLSv1_2) && !defined(OPENSSL_NO_TLS1)
-		case MQTT_SSL_VERSION_TLS_1_2:
-			net->ctx = SSL_CTX_new(TLSv1_2_client_method());
-			break;
-#endif
-		default:
-			break;
-		}
-#endif
 		if (net->ctx == NULL)
 		{
 			if (opts->struct_version >= 3)
@@ -662,6 +630,17 @@ int SSLSocket_createContext(networkHandles* net, MQTTClient_SSLOptions* opts)
 		}
 	}
 
+	if (opts->enabledGroups)
+	{
+		if ((rc = SSL_CTX_set1_groups_list(net->ctx, opts->enabledGroups)) != 1)
+		{
+			if (opts->struct_version >= 3)
+				SSLSocket_error("SSL_CTX_set1_group_list", NULL, net->socket, rc, opts->ssl_error_cb, opts->ssl_error_context);
+			else
+				SSLSocket_error("SSL_CTX_set1_group_list", NULL, net->socket, rc, NULL, NULL);
+			goto free_ctx;
+		}
+	}
 #ifndef OPENSSL_NO_PSK
 	if (opts->ssl_psk_cb != NULL)
 	{
